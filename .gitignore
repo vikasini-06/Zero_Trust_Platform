@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Environment Variables & Secrets (Never commit production credentials)
+.env
+.env.local
+.env.production
+.env.development
+*.env
+!.env.example
+!*/.env.example
+
+# Build Artifacts
+dist/
+build/
+*/dist/
+*/build/
+
+# Local Database & Cache Directories
+data/
+data/db/
+.cache/
+.npm/
+
+# Logs & Diagnostic Outputs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & Editor generated files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Binaries & Executables
+*.exe
+*.dll
+*.bat
