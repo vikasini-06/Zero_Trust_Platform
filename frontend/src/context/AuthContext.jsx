@@ -16,10 +16,10 @@ export const AuthProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    const rawApiUrl = import.meta.env.VITE_API_BASE_URL;
+    const rawApiUrl = import.meta.env.VITE_API_BASE_URL || 'https://zero-trust-platform-66sf.onrender.com';
     const socketOrigin = rawApiUrl
       ? rawApiUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
-      : window.location.origin;
+      : 'https://zero-trust-platform-66sf.onrender.com';
 
     const s = io(socketOrigin, {
       transports: ['websocket', 'polling'],

@@ -39,26 +39,37 @@ app.set('trust proxy', 1);
 const allowedOrigins = [
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:3000',
+  'https://zero-trust-platform-virid.vercel.app',
   process.env.CLIENT_URL,
   process.env.FRONTEND_URL,
 ]
   .filter(Boolean)
   .flatMap((url) => url.split(',').map((u) => u.trim().replace(/\/$/, '')));
 
+const isAllowedOrigin = (origin) => {
+  if (!origin) return true;
+  const cleanOrigin = origin.trim().replace(/\/$/, '');
+  return (
+    allowedOrigins.includes(cleanOrigin) ||
+    cleanOrigin.endsWith('.vercel.app') ||
+    cleanOrigin.endsWith('.onrender.com') ||
+    cleanOrigin.includes('localhost') ||
+    cleanOrigin.includes('127.0.0.1') ||
+    process.env.NODE_ENV !== 'production'
+  );
+};
+
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (
-      allowedOrigins.includes(origin) ||
-      process.env.NODE_ENV !== 'production' ||
-      origin.endsWith('.onrender.com')
-    ) {
+    if (isAllowedOrigin(origin)) {
       return callback(null, true);
     }
+    logger.warn(`[CORS] Blocked request from unauthorized origin: ${origin}`);
     return callback(new Error(`Origin ${origin} not permitted by Zero Trust CORS policy`));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: [
     'Content-Type',
     'Authorization',
@@ -66,12 +77,18 @@ const corsOptions = {
     'x-device-id',
     'x-device-name',
     'x-client-location',
+    'Accept',
+    'Origin',
+    'X-Requested-With',
   ],
+  exposedHeaders: ['x-session-id', 'x-device-id'],
+  optionsSuccessStatus: 200,
 };
 
 // Setup Socket.IO for continuous live SOC telemetry & alert dispatch
 const io = new Server(server, {
   cors: corsOptions,
+  transports: ['websocket', 'polling'],
 });
 
 setSocketIO(io);
@@ -89,10 +106,12 @@ app.use(
   helmet({
     contentSecurityPolicy: false,
     crossOriginEmbedderPolicy: false,
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
 
 app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true }));

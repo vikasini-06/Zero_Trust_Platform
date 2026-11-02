@@ -10,13 +10,15 @@ const getClientDeviceId = () => {
   return devId;
 };
 
+const BACKEND_BASE_URL = 'https://zero-trust-platform-66sf.onrender.com';
+
 const getBaseURL = () => {
-  const envUrl = import.meta.env.VITE_API_BASE_URL;
+  const envUrl = import.meta.env.VITE_API_BASE_URL || BACKEND_BASE_URL;
   if (envUrl) {
-    const cleanUrl = envUrl.replace(/\/$/, '');
+    const cleanUrl = envUrl.trim().replace(/\/$/, '');
     return cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
   }
-  return '/api';
+  return `${BACKEND_BASE_URL}/api`;
 };
 
 const api = axios.create({

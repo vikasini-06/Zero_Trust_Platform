@@ -22,9 +22,9 @@ services:
       - key: JWT_EXPIRES_IN
         value: 24h
       - key: CLIENT_URL
-        sync: false
+        value: https://zero-trust-platform-virid.vercel.app,http://localhost:5173
       - key: FRONTEND_URL
-        sync: false
+        value: https://zero-trust-platform-virid.vercel.app
 
   # -------------------------------------------------------------
   # Zero Trust Cybersecurity Dashboard & UI (Static Site)
